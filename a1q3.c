@@ -21,5 +21,24 @@
 #include <sys/wait.h>
 #include <string.h>
 int main(int argc, char *argv[]) {
+    int pipePS[2]; // Pipe for ps to sort
+    int pipeSW[2]; // Pipe for sort to ws
 
+    // Init first pipe
+    if (pipe(pipePS) == -1){
+        perror("ps to sort pipe failed to initialize.");
+        exit(1);
+    }
+
+    // Init second pipe
+    if (pipe(pipeSW) == -1){
+        perror("sort to ws pipe failed to initialize.");
+        exit(1);
+    }
+
+    //Fork process
+
+
+    return 0;
 }
+

@@ -14,3 +14,12 @@
 //shell. Remember, the goal is not to reimplement the commands themselves but to orchestrate their
 //execution and intercommunication in a C/C++ program.
 //------------------------------------------------------------------------------------------
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <string.h>
+int main(int argc, char *argv[]) {
+
+}

@@ -37,7 +37,6 @@ int main(int argc, char *argv[]) {
     }
 
     //Fork process
-    // Silly comment
 
 
     return 0;

@@ -35,10 +35,93 @@ int main(int argc, char *argv[]) {
         perror("sort to ws pipe failed to initialize.");
         exit(1);
     }
+    // Fork first process for `ps xao sid`
+    pid_t pid1 = fork();
+    if (pid1 < 0) {
+        perror("Fork for ps failed.");
+        exit(1);
+    }
+    if (pid1 == 0) { // Child process for `ps`
+        // Redirect stdout to pipePS write end
+        dup2(pipePS[1], STDOUT_FILENO);
 
-    //Fork process
+        // Close unused pipe ends
+        close(pipePS[0]); // Close read end of first pipe
+        close(pipePS[1]); // Close write end of first pipe
+        close(pipeSW[0]); // Close both ends of second pipe
+        close(pipeSW[1]);
 
+        // Execute `ps xao sid`
+        execlp("ps", "ps", "xao", "sid", NULL);
+
+        // If exec fails
+        perror("ps command failed");
+        exit(1);
+    }
+
+    // Fork second process for `sort -u`
+    pid_t pid2 = fork();
+    if (pid2 < 0) {
+        perror("Fork for sort failed.");
+        exit(1);
+    }
+    if (pid2 == 0) { // Child process for `sort`
+        // Redirect stdin to pipePS read end
+        dup2(pipePS[0], STDIN_FILENO);
+
+        // Redirect stdout to pipeSW write end
+        dup2(pipeSW[1], STDOUT_FILENO);
+
+        // Close all pipe ends not in use
+        close(pipePS[0]); // Close read end of first pipe
+        close(pipePS[1]); // Close write end of first pipe
+        close(pipeSW[0]); // Close read end of second pipe
+        close(pipeSW[1]); // Close write end of second pipe
+
+        // Execute `sort -u`
+        execlp("sort", "sort", "-u", NULL);
+
+        // If exec fails
+        perror("sort command failed");
+        exit(1);
+    }
+
+    // Fork third process for `wc -l`
+    pid_t pid3 = fork();
+    if (pid3 < 0) {
+        perror("Fork for wc failed.");
+        exit(1);
+    }
+    if (pid3 == 0) { // Child process for `wc`
+        // Redirect stdin to pipeSW read end
+        dup2(pipeSW[0], STDIN_FILENO);
+
+        // Close unused pipe ends
+        close(pipePS[0]); // Close both ends of first pipe
+        close(pipePS[1]);
+        close(pipeSW[0]); // Close read end of second pipe
+        close(pipeSW[1]); // Close write end of second pipe
+
+        // Execute `wc -l`
+        execlp("wc", "wc", "-l", NULL);
+
+        // If exec fails
+        perror("wc command failed");
+        exit(1);
+    }
+
+    // Parent process: Close all pipe ends
+    close(pipePS[0]);
+    close(pipePS[1]);
+    close(pipeSW[0]);
+    close(pipeSW[1]);
+
+    // Wait for all child processes to finish
+    waitpid(pid1, NULL, 0);
+    waitpid(pid2, NULL, 0);
+    waitpid(pid3, NULL, 0);
 
     return 0;
 }
+
 

@@ -1,6 +1,6 @@
 //Assignment 1
 //By: Michael Tahirovic, Ben Hamilton, Zach Pereira
-//Emails: tahi9525@mylaurier.ca, hami5217@mylaurier.ca, pere
+//Emails: tahi9525@mylaurier.ca, hami5217@mylaurier.ca, pere8946@mylaurier.ca
 //Date: 2024-09-26
 //------------------------------------------------------------------------------------------
 //Question 3:
